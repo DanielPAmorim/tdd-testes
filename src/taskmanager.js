@@ -50,3 +50,14 @@ export function addTask(tasks, title) {
   const newTask = createTask(title);
   return [...tasks, newTask];
 }
+
+// ------------------------------------------------------------
+// Alteração de estado
+// ------------------------------------------------------------
+
+export function toggleTask(task) {
+  return {
+    ...task,
+    completed: !task.completed,
+  };
+}
