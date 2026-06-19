@@ -6,6 +6,9 @@ import {
   toggleTask,
   removeTask,
   filterTasks,
+  countTasks,
+  countCompleted,
+  countPending,
   resetId,
 } from "../src/taskManager.js";
 // ============================================================
@@ -284,5 +287,77 @@ describe("filterTasks", () => {
     const result = filterTasks(tasks, "all");
 
     expect(result).not.toBe(tasks);
+  });
+});
+
+// ============================================================
+// 7. Contagens
+// ============================================================
+describe("countTasks", () => {
+  it("deve retornar 0 para lista vazia", () => {
+    expect(countTasks([])).toBe(0);
+  });
+
+  it("deve retornar o total de tarefas", () => {
+    resetId();
+    let tasks = addTask([], "Tarefa 1");
+    tasks = addTask(tasks, "Tarefa 2");
+    tasks = addTask(tasks, "Tarefa 3");
+
+    expect(countTasks(tasks)).toBe(3);
+  });
+});
+
+describe("countCompleted", () => {
+  let tasks;
+
+  beforeEach(() => {
+    resetId();
+    tasks = addTask([], "Tarefa 1");
+    tasks = addTask(tasks, "Tarefa 2");
+    tasks = addTask(tasks, "Tarefa 3");
+    tasks = tasks.map((t) => (t.id <= 2 ? toggleTask(t) : t));
+  });
+
+  it("deve retornar 0 para lista vazia", () => {
+    expect(countCompleted([])).toBe(0);
+  });
+
+  it("deve contar corretamente as tarefas concluídas", () => {
+    expect(countCompleted(tasks)).toBe(2);
+  });
+
+  it("deve retornar 0 quando nenhuma tarefa está concluída", () => {
+    resetId();
+    let noCompleted = addTask([], "Tarefa A");
+    noCompleted = addTask(noCompleted, "Tarefa B");
+
+    expect(countCompleted(noCompleted)).toBe(0);
+  });
+});
+
+describe("countPending", () => {
+  let tasks;
+
+  beforeEach(() => {
+    resetId();
+    tasks = addTask([], "Tarefa 1");
+    tasks = addTask(tasks, "Tarefa 2");
+    tasks = addTask(tasks, "Tarefa 3");
+    tasks = tasks.map((t) => (t.id === 1 ? toggleTask(t) : t));
+  });
+
+  it("deve retornar 0 para lista vazia", () => {
+    expect(countPending([])).toBe(0);
+  });
+
+  it("deve contar corretamente as tarefas pendentes", () => {
+    expect(countPending(tasks)).toBe(2);
+  });
+
+  it("deve retornar 0 quando todas as tarefas estão concluídas", () => {
+    const allCompleted = tasks.map((t) => ({ ...t, completed: true }));
+
+    expect(countPending(allCompleted)).toBe(0);
   });
 });
