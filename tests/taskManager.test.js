@@ -4,6 +4,7 @@ import {
   createTask,
   addTask,
   toggleTask,
+  removeTask,
   resetId,
 } from "../src/taskManager.js";
 // ============================================================
@@ -146,39 +147,86 @@ describe("addTask", () => {
 // ============================================================
 // 4. toggleTask
 // ============================================================
-describe('toggleTask', () => {
+describe("toggleTask", () => {
   beforeEach(() => {
     resetId();
   });
 
-  it('deve marcar uma tarefa pendente como concluída', () => {
-    const task = createTask('Tarefa pendente');
+  it("deve marcar uma tarefa pendente como concluída", () => {
+    const task = createTask("Tarefa pendente");
     const toggled = toggleTask(task);
 
     expect(toggled.completed).toBe(true);
   });
 
-  it('deve desmarcar uma tarefa concluída', () => {
-    const task = createTask('Tarefa pendente');
+  it("deve desmarcar uma tarefa concluída", () => {
+    const task = createTask("Tarefa pendente");
     const completed = toggleTask(task);
     const uncompleted = toggleTask(completed);
 
     expect(uncompleted.completed).toBe(false);
   });
 
-  it('deve manter o id e o título inalterados', () => {
-    const task = createTask('Minha tarefa');
+  it("deve manter o id e o título inalterados", () => {
+    const task = createTask("Minha tarefa");
     const toggled = toggleTask(task);
 
     expect(toggled.id).toBe(task.id);
     expect(toggled.title).toBe(task.title);
   });
 
-  it('deve retornar um NOVO objeto (imutabilidade)', () => {
-    const task = createTask('Tarefa original');
+  it("deve retornar um NOVO objeto (imutabilidade)", () => {
+    const task = createTask("Tarefa original");
     const toggled = toggleTask(task);
 
     expect(toggled).not.toBe(task);
     expect(task.completed).toBe(false); // original inalterado
+  });
+});
+
+// ============================================================
+// 5. removeTask
+// ============================================================
+describe("removeTask", () => {
+  let tasks;
+
+  beforeEach(() => {
+    resetId();
+    tasks = addTask([], "Tarefa 1");
+    tasks = addTask(tasks, "Tarefa 2");
+    tasks = addTask(tasks, "Tarefa 3");
+  });
+
+  it("deve remover uma tarefa pelo ID", () => {
+    const updated = removeTask(tasks, 2);
+
+    expect(updated).toHaveLength(2);
+    expect(updated.find((t) => t.id === 2)).toBeUndefined();
+  });
+
+  it("deve manter as outras tarefas intactas", () => {
+    const updated = removeTask(tasks, 2);
+
+    expect(updated[0].title).toBe("Tarefa 1");
+    expect(updated[1].title).toBe("Tarefa 3");
+  });
+
+  it("deve retornar um NOVO array (imutabilidade)", () => {
+    const updated = removeTask(tasks, 1);
+
+    expect(updated).not.toBe(tasks);
+    expect(tasks).toHaveLength(3); // original inalterado
+  });
+
+  it("deve retornar a lista completa se o ID não existir", () => {
+    const updated = removeTask(tasks, 999);
+
+    expect(updated).toHaveLength(3);
+  });
+
+  it("deve retornar array vazio ao remover de lista vazia", () => {
+    const updated = removeTask([], 1);
+
+    expect(updated).toHaveLength(0);
   });
 });
