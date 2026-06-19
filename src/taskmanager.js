@@ -44,8 +44,12 @@ export function createTask(title, priority = 'medium') {
 export function addTask(tasks, title) {
   if (!validateTitle(title)) {
     throw new Error(
-      "Título inválido: deve ser uma string com pelo menos 3 caracteres.",
+      'Título inválido: deve ser uma string com pelo menos 3 caracteres.'
     );
+  }
+
+  if (isDuplicate(tasks, title)) {
+    throw new Error('Tarefa já existe');
   }
 
   const newTask = createTask(title);
@@ -113,4 +117,15 @@ export function validatePriority(priority) {
 
 export function filterByPriority(tasks, priority) {
   return tasks.filter((task) => task.priority === priority);
+}
+// ------------------------------------------------------------
+// Verificação de Duplicatas
+// ------------------------------------------------------------
+
+export function isDuplicate(tasks, title) {
+  const normalizedInput = title.trim().toLowerCase();
+  
+  return tasks.some((task) => 
+    task.title.toLowerCase() === normalizedInput
+  );
 }
