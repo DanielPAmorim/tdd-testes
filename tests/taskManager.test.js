@@ -13,6 +13,7 @@ import {
   filterByPriority,
   isDuplicate,
   sortTasks,
+  searchTasks,
   resetId,
 } from "../src/taskManager.js";
 // ============================================================
@@ -367,7 +368,7 @@ describe("countPending", () => {
 });
 
 // ============================================================
-// 8. Prioridade de Tarefas (Exercício 4)
+// 8. Prioridade de Tarefas
 // ============================================================
 
 describe("validatePriority", () => {
@@ -431,7 +432,7 @@ describe("filterByPriority", () => {
 });
 
 // ============================================================
-// 9. Tarefas Duplicadas (Exercício 5)
+// 9. Tarefas Duplicadas
 // ============================================================
 
 describe('isDuplicate', () => {
@@ -465,7 +466,7 @@ describe('addTask (duplicatas)', () => {
 });
 
 // ============================================================
-// 10. Ordenar Tarefas (Exercício 6)
+// 10. Ordenar Tarefas
 // ============================================================
 
 describe('sortTasks', () => {
@@ -520,5 +521,52 @@ describe('sortTasks', () => {
   it('deve retornar um NOVO array (imutabilidade)', () => {
     const sorted = sortTasks(tasks);
     expect(sorted).not.toBe(tasks);
+  });
+});
+
+// ============================================================
+// 11. Busca por Texto
+// ============================================================
+
+describe('searchTasks', () => {
+  let tasks;
+
+  beforeEach(() => {
+    resetId();
+    tasks = [
+      createTask('Estudar Node.js'),
+      createTask('Testar a aplicação'),
+      createTask('Comprar pão')
+    ];
+  });
+
+  it('deve encontrar tarefas que contenham a query', () => {
+    // "est" tem em "Estudar" e "Testar"
+    const results = searchTasks(tasks, 'est');
+    
+    expect(results).toHaveLength(2);
+    expect(results[0].title).toBe('Estudar Node.js');
+    expect(results[1].title).toBe('Testar a aplicação');
+  });
+
+  it('deve ser case-insensitive (ignorar maiúsculas/minúsculas)', () => {
+    const results = searchTasks(tasks, 'NODE');
+    
+    expect(results).toHaveLength(1);
+    expect(results[0].title).toBe('Estudar Node.js');
+  });
+
+  it('deve retornar array vazio se nenhuma tarefa corresponder', () => {
+    const results = searchTasks(tasks, 'xyz');
+    expect(results).toHaveLength(0);
+  });
+
+  it('deve retornar array vazio se a lista de tarefas estiver vazia', () => {
+    expect(searchTasks([], 'algo')).toHaveLength(0);
+  });
+
+  it('deve retornar todas as tarefas se a query for uma string vazia', () => {
+    const results = searchTasks(tasks, '');
+    expect(results).toHaveLength(3);
   });
 });
