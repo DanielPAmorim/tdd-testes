@@ -140,3 +140,15 @@ export function sortTasks(tasks) {
   
   return [...pending, ...completed];
 }
+
+// ------------------------------------------------------------
+// Busca por Texto
+// ------------------------------------------------------------
+
+export function searchTasks(tasks, query) {
+  const normalizedQuery = query.toLowerCase();
+  
+  return tasks.filter((task) => 
+    task.title.toLowerCase().includes(normalizedQuery)
+  );
+}
