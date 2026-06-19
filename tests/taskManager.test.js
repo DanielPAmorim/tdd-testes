@@ -9,6 +9,8 @@ import {
   countTasks,
   countCompleted,
   countPending,
+  validatePriority,
+  filterByPriority,
   resetId,
 } from "../src/taskManager.js";
 // ============================================================
@@ -359,5 +361,69 @@ describe("countPending", () => {
     const allCompleted = tasks.map((t) => ({ ...t, completed: true }));
 
     expect(countPending(allCompleted)).toBe(0);
+  });
+});
+
+// ============================================================
+// 8. Prioridade de Tarefas (Exercício 4)
+// ============================================================
+
+describe("validatePriority", () => {
+  it("deve retornar true para prioridades válidas", () => {
+    expect(validatePriority("low")).toBe(true);
+    expect(validatePriority("medium")).toBe(true);
+    expect(validatePriority("high")).toBe(true);
+  });
+
+  it("deve retornar false para prioridades inválidas", () => {
+    expect(validatePriority("urgente")).toBe(false);
+    expect(validatePriority("baixa")).toBe(false);
+    expect(validatePriority("")).toBe(false);
+    expect(validatePriority(null)).toBe(false);
+  });
+});
+
+describe("createTask (prioridade)", () => {
+  beforeEach(() => {
+    resetId();
+  });
+
+  it("deve atribuir a prioridade informada", () => {
+    const task = createTask("Tarefa Importante", "high");
+    expect(task.priority).toBe("high");
+  });
+
+  it('deve atribuir prioridade "medium" por padrão', () => {
+    const task = createTask("Tarefa Normal");
+    expect(task.priority).toBe("medium");
+  });
+});
+
+describe("filterByPriority", () => {
+  let tasks;
+
+  beforeEach(() => {
+    resetId();
+    // Criamos tarefas diretamente para testar o filtro
+    tasks = [
+      createTask("Tarefa 1", "low"),
+      createTask("Tarefa 2", "high"),
+      createTask("Tarefa 3", "medium"),
+      createTask("Tarefa 4", "high"),
+    ];
+  });
+
+  it("deve retornar apenas as tarefas da prioridade solicitada", () => {
+    const highPriorityTasks = filterByPriority(tasks, "high");
+
+    expect(highPriorityTasks).toHaveLength(2);
+    expect(highPriorityTasks[0].title).toBe("Tarefa 2");
+    expect(highPriorityTasks[1].title).toBe("Tarefa 4");
+  });
+
+  it("deve retornar array vazio se não houver tarefas com a prioridade", () => {
+    // Usando uma prioridade que não existe na nossa lista atual
+    const urgenteTasks = filterByPriority(tasks, "urgente");
+    expect(urgenteTasks).toHaveLength(0);
   });
 });
