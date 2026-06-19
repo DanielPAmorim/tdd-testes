@@ -12,6 +12,7 @@ import {
   validatePriority,
   filterByPriority,
   isDuplicate,
+  sortTasks,
   resetId,
 } from "../src/taskManager.js";
 // ============================================================
@@ -460,5 +461,64 @@ describe('addTask (duplicatas)', () => {
     const tasks = [createTask('Estudar')];
     
     expect(() => addTask(tasks, 'estudar')).toThrow('Tarefa já existe');
+  });
+});
+
+// ============================================================
+// 10. Ordenar Tarefas (Exercício 6)
+// ============================================================
+
+describe('sortTasks', () => {
+  let tasks;
+
+  beforeEach(() => {
+    resetId();
+    tasks = [
+      createTask('Tarefa 1'), // Pendente (ID 1)
+      createTask('Tarefa 2'), // Pendente (ID 2)
+      createTask('Tarefa 3'), // Pendente (ID 3)
+    ];
+    
+    // Vamos marcar a Tarefa 1 e a Tarefa 3 como concluídas
+    // A lista original ficará: [Concluída, Pendente, Concluída]
+    tasks[0] = toggleTask(tasks[0]);
+    tasks[2] = toggleTask(tasks[2]);
+  });
+
+  it('deve retornar pendentes primeiro, depois concluídas', () => {
+    const sorted = sortTasks(tasks);
+    
+    expect(sorted).toHaveLength(3);
+    expect(sorted[0].id).toBe(2); // A pendente deve subir para a primeira posição
+    expect(sorted[1].id).toBe(1); // As concluídas vêm depois, na ordem original
+    expect(sorted[2].id).toBe(3); 
+  });
+
+  it('deve manter a ordem se todas forem pendentes', () => {
+    const pendingTasks = [createTask('A'), createTask('B')];
+    const sorted = sortTasks(pendingTasks);
+    
+    expect(sorted[0].title).toBe('A');
+    expect(sorted[1].title).toBe('B');
+  });
+
+  it('deve manter a ordem se todas forem concluídas', () => {
+    const completedTasks = [
+      toggleTask(createTask('A')),
+      toggleTask(createTask('B'))
+    ];
+    const sorted = sortTasks(completedTasks);
+    
+    expect(sorted[0].title).toBe('A');
+    expect(sorted[1].title).toBe('B');
+  });
+
+  it('deve retornar array vazio para lista vazia', () => {
+    expect(sortTasks([])).toHaveLength(0);
+  });
+
+  it('deve retornar um NOVO array (imutabilidade)', () => {
+    const sorted = sortTasks(tasks);
+    expect(sorted).not.toBe(tasks);
   });
 });
