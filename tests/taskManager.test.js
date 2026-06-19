@@ -11,6 +11,7 @@ import {
   countPending,
   validatePriority,
   filterByPriority,
+  isDuplicate,
   resetId,
 } from "../src/taskManager.js";
 // ============================================================
@@ -425,5 +426,39 @@ describe("filterByPriority", () => {
     // Usando uma prioridade que não existe na nossa lista atual
     const urgenteTasks = filterByPriority(tasks, "urgente");
     expect(urgenteTasks).toHaveLength(0);
+  });
+});
+
+// ============================================================
+// 9. Tarefas Duplicadas (Exercício 5)
+// ============================================================
+
+describe('isDuplicate', () => {
+  let tasks;
+
+  beforeEach(() => {
+    resetId();
+    tasks = [createTask('Estudar Node')];
+  });
+
+  it('deve retornar true se a tarefa já existe (título exato)', () => {
+    expect(isDuplicate(tasks, 'Estudar Node')).toBe(true);
+  });
+
+  it('deve retornar true ignorando maiúsculas/minúsculas e espaços', () => {
+    expect(isDuplicate(tasks, '  estudar node  ')).toBe(true);
+  });
+
+  it('deve retornar false se a tarefa não existe', () => {
+    expect(isDuplicate(tasks, 'Estudar React')).toBe(false);
+  });
+});
+
+describe('addTask (duplicatas)', () => {
+  it('deve lançar erro ao tentar adicionar tarefa com título duplicado', () => {
+    resetId();
+    const tasks = [createTask('Estudar')];
+    
+    expect(() => addTask(tasks, 'estudar')).toThrow('Tarefa já existe');
   });
 });
