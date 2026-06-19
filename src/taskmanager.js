@@ -129,3 +129,14 @@ export function isDuplicate(tasks, title) {
     task.title.toLowerCase() === normalizedInput
   );
 }
+
+// ------------------------------------------------------------
+// Ordenação 
+// ------------------------------------------------------------
+
+export function sortTasks(tasks) {
+  const pending = tasks.filter((task) => task.completed === false);
+  const completed = tasks.filter((task) => task.completed === true);
+  
+  return [...pending, ...completed];
+}
